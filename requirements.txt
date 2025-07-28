@@ -22,4 +22,3 @@ streamlit
 
 # Additional dependencies
 python-dotenv
-python>=3.8
