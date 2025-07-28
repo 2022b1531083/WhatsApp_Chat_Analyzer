@@ -68,7 +68,7 @@ def identify_group_roles(df):
                             time_diff = (temp.loc[idx, 'date'] - temp.loc[idx-1, 'date']).total_seconds() / 60
                             if time_diff < 30:  # Responded within 30 minutes
                                 responses_to_others += 1
-                    except:
+                    except (KeyError, IndexError):
                         continue
             
             user_stats[user] = {
@@ -133,8 +133,7 @@ def identify_group_roles(df):
             }
         
         return roles
-    except Exception as e:
-        print(f"Error in identify_group_roles: {str(e)}")
+    except Exception:
         return {}
 
 def communication_bridges_analysis(df):
@@ -165,7 +164,7 @@ def communication_bridges_analysis(df):
         )
         
         return bridge_scores.sort_values('bridge_score', ascending=False)
-    except:
+    except Exception:
         return pd.DataFrame()
 
 def group_activity_correlation(df):
@@ -250,7 +249,7 @@ def relationship_evolution_analysis(selected_user, df):
                 blob = TextBlob(message)
                 sentiments.append(blob.sentiment.polarity)
             stats['avg_sentiment'] = np.mean(sentiments)
-        except:
+        except Exception:
             stats['avg_sentiment'] = 0
         
         monthly_stats.append(stats)
@@ -307,7 +306,7 @@ def generate_chat_insights(selected_user, df):
             insights.append("😊 Overall positive communication tone.")
         elif positive_ratio < 0.3:
             insights.append("😐 Communication tends to be neutral or serious.")
-    except:
+    except Exception:
         pass
     
     # Response time insight
@@ -320,7 +319,7 @@ def generate_chat_insights(selected_user, df):
                 insights.append("⚡ Very responsive conversation - typical response under 10 minutes.")
             elif avg_resp_time < 60:
                 insights.append("🕐 Good response time - typically reply within an hour.")
-    except:
+    except Exception:
         pass
     
     return insights
@@ -437,7 +436,7 @@ def calculate_communication_badges(selected_user, df):
                     user_badges.append("⚡ Lightning Fast (Avg <5min response)")
                 elif avg_resp_time < 30:
                     user_badges.append("🏃 Quick Responder (Avg <30min response)")
-        except:
+        except Exception:
             pass
         
         badges[user] = user_badges
@@ -467,7 +466,7 @@ def personality_matching_analysis(df):
                 blob = TextBlob(message)
                 sentiments.append(blob.sentiment.polarity)
             avg_sentiment = np.mean(sentiments)
-        except:
+        except Exception:
             avg_sentiment = 0
         
         # Time patterns
@@ -659,7 +658,7 @@ def generate_comprehensive_report(selected_user, df):
                     'neutral_ratio': sentiment_counts.get('Neutral', 0) / len(sentiment_data),
                     'avg_polarity': sentiment_data['polarity'].mean()
                 }
-        except:
+        except Exception:
             pass
         
         # Response patterns
@@ -672,7 +671,7 @@ def generate_comprehensive_report(selected_user, df):
                     'median_response_time_minutes': response_df['response_time_minutes'].median(),
                     'fastest_responders': avg_response.sort_values('mean').head(3).to_dict()
                 }
-        except:
+        except Exception:
             pass
         
         # Communication style
@@ -680,7 +679,7 @@ def generate_comprehensive_report(selected_user, df):
             from enhanced_helper_1 import communication_style_analysis
             style_analysis = communication_style_analysis(selected_user, df)
             report['communication_style'] = style_analysis.to_dict()
-        except:
+        except Exception:
             pass
         
         # Important moments
@@ -691,7 +690,7 @@ def generate_comprehensive_report(selected_user, df):
                 'count': len(moments),
                 'top_moments': moments.head(5).to_dict('records') if not moments.empty else []
             }
-        except:
+        except Exception:
             pass
         
         # Generate insights
@@ -701,7 +700,7 @@ def generate_comprehensive_report(selected_user, df):
         try:
             badges = calculate_communication_badges(selected_user, df)
             report['badges'] = badges
-        except:
+        except Exception:
             pass
         
     except Exception as e:

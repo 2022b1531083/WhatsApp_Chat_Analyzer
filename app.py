@@ -1,15 +1,25 @@
 import streamlit as st
 import preprocessor
-from enhanced_helper_1 import *
-from enhanced_helper_2 import *
+from enhanced_helper_1 import (
+    fetch_stats, monthly_timeline, emoji_helper, most_common_words, 
+    create_wordcloud, most_busy_users, sentiment_analysis, sentiment_timeline,
+    response_time_analysis, conversation_initiator_analysis, message_length_analysis,
+    communication_style_analysis, topic_modeling, detect_important_moments
+)
+from enhanced_helper_2 import (
+    group_interaction_matrix, identify_group_roles, generate_chat_insights,
+    conversation_highlights, predict_activity_patterns, relationship_evolution_analysis,
+    calculate_communication_badges, personality_matching_analysis, create_anonymous_analysis,
+    generate_comprehensive_report
+)
 import matplotlib.pyplot as plt
-import seaborn as sns
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
 from datetime import datetime
 import warnings
+import html
 warnings.filterwarnings('ignore')
 
 # Enable caching for better performance
@@ -41,553 +51,7 @@ if 'dark_mode' not in st.session_state:
 
 # Professional modern CSS styling with excellent font visibility
 st.markdown("""
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-    
-    .stApp {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        transition: all 0.3s ease;
-    }
-    
-    /* Light Theme (Default) - Professional & Modern */
-    .stApp:not(.dark-mode) {
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 25%, #cbd5e1 50%, #94a3b8 75%, #64748b 100%);
-        color: #1e293b;
-    }
-    
-    /* Dark Theme - Professional & Modern */
-    .stApp.dark-mode {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #334155 50%, #475569 75%, #64748b 100%);
-        color: #f1f5f9;
-    }
-    
-    /* Professional Header */
-    .main-header {
-        font-size: 3.5rem;
-        font-weight: 700;
-        text-align: center;
-        margin-bottom: 1rem;
-        background: linear-gradient(45deg, #3b82f6, #1d4ed8, #1e40af);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        letter-spacing: -0.02em;
-    }
-    
-    .dark-mode .main-header {
-        background: linear-gradient(45deg, #60a5fa, #3b82f6, #1d4ed8);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-    
-    .subtitle {
-        font-size: 1.2rem;
-        color: #64748b;
-        text-align: center;
-        margin-bottom: 3rem;
-        font-weight: 400;
-        line-height: 1.6;
-    }
-    
-    .dark-mode .subtitle {
-        color: #cbd5e1;
-    }
-    
-    /* Professional Cards */
-    .welcome-container {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border-radius: 16px;
-        padding: 3rem;
-        margin: 2rem 0;
-        border: 1px solid rgba(148, 163, 184, 0.1);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        text-align: center;
-    }
-    
-    .dark-mode .welcome-container {
-        background: rgba(30, 41, 59, 0.95);
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-    }
-    
-    /* Enhanced Sidebar Styling for Better Visibility */
-    .css-1d391kg {
-        background: linear-gradient(180deg, #1e293b 0%, #334155 100%);
-        color: #f8fafc !important;
-    }
-    
-    .css-1d391kg .stMarkdown {
-        color: #f8fafc !important;
-    }
-    
-    .css-1d391kg .stMarkdown h1,
-    .css-1d391kg .stMarkdown h2,
-    .css-1d391kg .stMarkdown h3,
-    .css-1d391kg .stMarkdown h4,
-    .css-1d391kg .stMarkdown h5,
-    .css-1d391kg .stMarkdown h6 {
-        color: #f8fafc !important;
-        font-weight: 600;
-    }
-    
-    .css-1d391kg .stMarkdown p {
-        color: #cbd5e1 !important;
-    }
-    
-    /* Enhanced Checkbox and Selectbox Visibility */
-    .css-1d391kg .stCheckbox > label {
-        color: #f8fafc !important;
-        font-weight: 500;
-    }
-    
-    .css-1d391kg .stSelectbox > label {
-        color: #f8fafc !important;
-        font-weight: 500;
-    }
-    
-    .css-1d391kg .stButton > button {
-        background: linear-gradient(45deg, #3b82f6, #1d4ed8);
-        color: white !important;
-        border: none;
-        border-radius: 8px;
-        padding: 0.5rem 1rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .css-1d391kg .stButton > button:hover {
-        background: linear-gradient(45deg, #1d4ed8, #1e40af);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-    }
-    
-    /* File Uploader Enhancement */
-    .css-1d391kg .stFileUploader > div {
-        border: 2px solid #3b82f6 !important;
-        border-radius: 8px;
-        background: rgba(59, 130, 246, 0.1);
-    }
-    
-    .css-1d391kg .stFileUploader > div:hover {
-        border-color: #1d4ed8 !important;
-        background: rgba(59, 130, 246, 0.2);
-    }
-    
-    /* Selectbox Enhancement */
-    .css-1d391kg .stSelectbox > div > div {
-        border: 2px solid #3b82f6 !important;
-        border-radius: 8px;
-        background: rgba(59, 130, 246, 0.1);
-    }
-    
-    .css-1d391kg .stSelectbox > div > div:hover {
-        border-color: #1d4ed8 !important;
-        background: rgba(59, 130, 246, 0.2);
-    }
-    
-    .feature-card {
-        background: rgba(255, 255, 255, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        border-radius: 12px;
-        padding: 2rem;
-        margin: 1.5rem 0;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        text-align: center;
-    }
-    
-    .feature-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-        border-color: #3b82f6;
-    }
-    
-    .dark-mode .feature-card {
-        background: rgba(30, 41, 59, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.3);
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    }
-    
-    .dark-mode .feature-card:hover {
-        border-color: #60a5fa;
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
-    }
-    
-    .feature-icon {
-        font-size: 3rem;
-        margin-bottom: 1.5rem;
-        display: block;
-        text-align: center;
-        color: #3b82f6;
-    }
-    
-    .dark-mode .feature-icon {
-        color: #60a5fa;
-    }
-    
-    .feature-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: #1e293b;
-        text-align: center;
-        margin-bottom: 1rem;
-    }
-    
-    .dark-mode .feature-title {
-        color: #f1f5f9;
-    }
-    
-    .feature-description {
-        color: #64748b;
-        text-align: center;
-        line-height: 1.6;
-        font-weight: 400;
-        font-size: 1rem;
-    }
-    
-    .dark-mode .feature-description {
-        color: #cbd5e1;
-    }
-    
-    /* Professional Metric Cards */
-    .metric-card {
-        background: rgba(255, 255, 255, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        padding: 1.5rem;
-        border-radius: 12px;
-        margin: 1rem 0;
-        text-align: center;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    }
-    
-    .metric-card:hover {
-        transform: scale(1.02);
-        border-color: #3b82f6;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-    }
-    
-    .dark-mode .metric-card {
-        background: rgba(30, 41, 59, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.3);
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    }
-    
-    .dark-mode .metric-card:hover {
-        border-color: #60a5fa;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-    }
-    
-    .metric-card h2 {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #1e293b;
-        margin: 0.5rem 0;
-    }
-    
-    .dark-mode .metric-card h2 {
-        color: #f1f5f9;
-    }
-    
-    .metric-card h3 {
-        font-size: 1.5rem;
-        color: #3b82f6;
-        margin-bottom: 0.5rem;
-    }
-    
-    .dark-mode .metric-card h3 {
-        color: #60a5fa;
-    }
-    
-    .metric-card p {
-        font-size: 1rem;
-        color: #64748b;
-        font-weight: 500;
-        margin: 0;
-    }
-    
-    .dark-mode .metric-card p {
-        color: #cbd5e1;
-    }
-    
-    /* Professional Step Cards */
-    .step-card {
-        background: rgba(255, 255, 255, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin: 1rem 0;
-        border-left: 4px solid #3b82f6;
-        color: #1e293b;
-        transition: all 0.3s ease;
-    }
-    
-    .step-card:hover {
-        transform: translateX(4px);
-        border-color: #1d4ed8;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-    
-    .dark-mode .step-card {
-        background: rgba(30, 41, 59, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.3);
-        border-left: 4px solid #60a5fa;
-        color: #f1f5f9;
-    }
-    
-    .dark-mode .step-card:hover {
-        border-color: #3b82f6;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-    
-    .step-number {
-        background: linear-gradient(45deg, #3b82f6, #1d4ed8);
-        color: white;
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        font-size: 1.2rem;
-        margin-right: 1rem;
-        box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
-    }
-    
-    /* Professional Use Case Cards */
-    .use-case-card {
-        background: rgba(255, 255, 255, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        border-radius: 8px;
-        padding: 1rem;
-        margin: 0.5rem 0;
-        transition: all 0.3s ease;
-        color: #1e293b;
-    }
-    
-    .use-case-card:hover {
-        transform: translateY(-2px);
-        border-color: #3b82f6;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    .dark-mode .use-case-card {
-        background: rgba(30, 41, 59, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.3);
-        color: #f1f5f9;
-    }
-    
-    .dark-mode .use-case-card:hover {
-        border-color: #60a5fa;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    }
-    
-    /* Professional Insight Boxes */
-    .insight-box {
-        background: rgba(255, 255, 255, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        padding: 1.5rem;
-        border-radius: 12px;
-        margin: 1rem 0;
-        color: #1e293b;
-        backdrop-filter: blur(10px);
-        transition: all 0.3s ease;
-    }
-    
-    .insight-box:hover {
-        transform: translateY(-2px);
-        border-color: #3b82f6;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-    
-    .dark-mode .insight-box {
-        background: rgba(30, 41, 59, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.3);
-        color: #f1f5f9;
-    }
-    
-    .dark-mode .insight-box:hover {
-        border-color: #60a5fa;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-    
-    /* Professional Advanced Sections */
-    .advanced-section {
-        background: rgba(255, 255, 255, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        border-radius: 12px;
-        padding: 2rem;
-        margin: 1.5rem 0;
-        transition: all 0.3s ease;
-    }
-    
-    .advanced-section:hover {
-        border-color: #3b82f6;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-    
-    .dark-mode .advanced-section {
-        background: rgba(30, 41, 59, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.3);
-    }
-    
-    .dark-mode .advanced-section:hover {
-        border-color: #60a5fa;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-    
-    /* Professional Badges */
-    .badge {
-        background: linear-gradient(45deg, #3b82f6, #1d4ed8);
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-size: 0.875rem;
-        margin: 0.25rem;
-        display: inline-block;
-        font-weight: 500;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-    }
-    
-    .badge:hover {
-        transform: scale(1.05);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-    
-    /* Professional Typography */
-    h1, h2, h3, h4, h5, h6 {
-        color: #1e293b !important;
-        font-weight: 600;
-    }
-    
-    .dark-mode h1, .dark-mode h2, .dark-mode h3, .dark-mode h4, .dark-mode h5, .dark-mode h6 {
-        color: #f1f5f9 !important;
-    }
-    
-    .stMarkdown p {
-        color: #64748b;
-        line-height: 1.6;
-    }
-    
-    .dark-mode .stMarkdown p {
-        color: #cbd5e1;
-    }
-    
-    /* Professional Form Elements */
-    .stSelectbox > div > div {
-        background: rgba(255, 255, 255, 0.9);
-        color: #1e293b;
-        border: 1px solid rgba(148, 163, 184, 0.3);
-        border-radius: 8px;
-        font-weight: 500;
-    }
-    
-    .dark-mode .stSelectbox > div > div {
-        background: rgba(30, 41, 59, 0.9);
-        color: #f1f5f9;
-        border: 1px solid rgba(148, 163, 184, 0.4);
-    }
-    
-    .stCheckbox > label {
-        color: #1e293b !important;
-        font-weight: 500;
-    }
-    
-    .dark-mode .stCheckbox > label {
-        color: #f1f5f9 !important;
-    }
-    
-    .stFileUploader > div {
-        border: 2px dashed rgba(148, 163, 184, 0.4);
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.5);
-    }
-    
-    .dark-mode .stFileUploader > div {
-        border: 2px dashed rgba(148, 163, 184, 0.5);
-        background: rgba(30, 41, 59, 0.5);
-    }
-    
-    /* Professional Sidebar */
-    .sidebar-header {
-        background: linear-gradient(45deg, #3b82f6, #1d4ed8);
-        color: white;
-        padding: 1rem;
-        border-radius: 12px;
-        text-align: center;
-        margin-bottom: 2rem;
-        font-weight: 600;
-        font-size: 1.1rem;
-        box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
-    }
-    
-    /* Professional Privacy Badge */
-    .privacy-badge {
-        background: linear-gradient(45deg, #10b981, #059669);
-        color: white;
-        padding: 1rem 2rem;
-        border-radius: 12px;
-        font-weight: 600;
-        display: inline-block;
-        margin: 1rem;
-        box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
-    }
-    
-    /* Section Spacing */
-    .section-spacer {
-        margin: 1.5rem 0;
-        padding: 1rem 0;
-        border-top: 1px solid rgba(148, 163, 184, 0.2);
-        border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-    }
-    
-    .dark-mode .section-spacer {
-        border-top: 1px solid rgba(148, 163, 184, 0.3);
-        border-bottom: 1px solid rgba(148, 163, 184, 0.3);
-    }
-    
-    .section-gap {
-        margin: 1rem 0;
-        padding: 0.5rem 0;
-    }
-    
-    .subsection-gap {
-        margin: 0.75rem 0;
-        padding: 0.25rem 0;
-    }
-    
-    /* Enhanced section headers */
-    .section-header {
-        margin-bottom: 1.5rem;
-        padding-bottom: 0.75rem;
-        border-bottom: 2px solid #3b82f6;
-        position: relative;
-    }
-    
-    .dark-mode .section-header {
-        border-bottom: 2px solid #60a5fa;
-    }
-    
-    .section-header::after {
-        content: '';
-        position: absolute;
-        bottom: -2px;
-        left: 0;
-        width: 50px;
-        height: 2px;
-        background: linear-gradient(45deg, #3b82f6, #1d4ed8);
-    }
-    
-    .dark-mode .section-header::after {
-        background: linear-gradient(45deg, #60a5fa, #3b82f6);
-    }
-    
-</style>
-""", unsafe_allow_html=True)
+<style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');.stApp{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;transition:all 0.3s ease;}.stApp:not(.dark-mode){background:linear-gradient(135deg,#f8fafc 0%,#e2e8f0 25%,#cbd5e1 50%,#94a3b8 75%,#64748b 100%);color:#1e293b;}.stApp.dark-mode{background:linear-gradient(135deg,#0f172a 0%,#1e293b 25%,#334155 50%,#475569 75%,#64748b 100%);color:#f1f5f9;}.main-header{font-size:3.5rem;font-weight:700;text-align:center;margin-bottom:1rem;background:linear-gradient(45deg,#3b82f6,#1d4ed8,#1e40af);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.02em;}.dark-mode .main-header{background:linear-gradient(45deg,#60a5fa,#3b82f6,#1d4ed8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}.subtitle{font-size:1.2rem;color:#64748b;text-align:center;margin-bottom:3rem;font-weight:400;line-height:1.6;}.dark-mode .subtitle{color:#cbd5e1;}.welcome-container{background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);border-radius:16px;padding:3rem;margin:2rem 0;border:1px solid rgba(148,163,184,0.1);box-shadow:0 10px 25px rgba(0,0,0,0.1);text-align:center;}.dark-mode .welcome-container{background:rgba(30,41,59,0.95);border:1px solid rgba(148,163,184,0.2);box-shadow:0 10px 25px rgba(0,0,0,0.3);}section[data-testid="stSidebar"]{background:linear-gradient(180deg,#1e293b 0%,#334155 100%);color:#f8fafc!important;}section[data-testid="stSidebar"] .stMarkdown{color:#f8fafc!important;}section[data-testid="stSidebar"] .stMarkdown h1,section[data-testid="stSidebar"] .stMarkdown h2,section[data-testid="stSidebar"] .stMarkdown h3,section[data-testid="stSidebar"] .stMarkdown h4,section[data-testid="stSidebar"] .stMarkdown h5,section[data-testid="stSidebar"] .stMarkdown h6{color:#f8fafc!important;font-weight:600;}section[data-testid="stSidebar"] .stMarkdown p{color:#cbd5e1!important;}section[data-testid="stSidebar"] .stCheckbox>label{color:#f8fafc!important;font-weight:500;}section[data-testid="stSidebar"] .stSelectbox>label{color:#f8fafc!important;font-weight:500;}section[data-testid="stSidebar"] .stButton>button{background:linear-gradient(45deg,#3b82f6,#1d4ed8);color:white!important;border:none;border-radius:8px;padding:0.5rem 1rem;font-weight:600;transition:all 0.3s ease;}section[data-testid="stSidebar"] .stButton>button:hover{background:linear-gradient(45deg,#1d4ed8,#1e40af);transform:translateY(-2px);box-shadow:0 4px 12px rgba(59,130,246,0.4);}section[data-testid="stSidebar"] .stFileUploader>div{border:2px solid #3b82f6!important;border-radius:8px;background:rgba(59,130,246,0.1);}section[data-testid="stSidebar"] .stFileUploader>div:hover{border-color:#1d4ed8!important;background:rgba(59,130,246,0.2);}section[data-testid="stSidebar"] .stSelectbox>div>div{border:2px solid #3b82f6!important;border-radius:8px;background:rgba(59,130,246,0.1);}section[data-testid="stSidebar"] .stSelectbox>div>div:hover{border-color:#1d4ed8!important;background:rgba(59,130,246,0.2);}.feature-card{background:rgba(255,255,255,0.9);border:1px solid rgba(148,163,184,0.2);border-radius:12px;padding:2rem;margin:1.5rem 0;transition:all 0.3s ease;box-shadow:0 4px 6px rgba(0,0,0,0.05);text-align:center;}.feature-card:hover{transform:translateY(-4px);box-shadow:0 12px 24px rgba(0,0,0,0.1);}</style>""",unsafe_allow_html=True)
 
 # Main title with professional styling
 st.markdown('<h1 class="main-header">WhatsApp Chat Analyzer</h1>', unsafe_allow_html=True)
@@ -687,32 +151,35 @@ if uploaded_file is not None:
 
     if st.sidebar.button("🚀 Run Analysis", type="primary"):
         
+        # Initialize progress tracking
+        progress_bar = st.progress(0)
+        status_text = st.empty()
+        
         # Show loading message
         with st.spinner("🔄 Processing your chat data... This may take a few moments for large files."):
             
-            # Progress bar
-            progress_bar = st.progress(0)
-            status_text = st.empty()
-            
-            # Apply privacy mode if enabled
+            # Step 1: Privacy mode and data preparation
             if privacy_mode:
                 status_text.text("🔒 Enabling privacy mode...")
-                progress_bar.progress(10)
+                progress_bar.progress(5)
                 st.info("🔒 Privacy Mode Enabled: All analysis will be performed anonymously without showing actual message content.")
                 df_analysis, user_mapping = create_anonymous_analysis(df)
-                progress_bar.progress(30)
+                progress_bar.progress(15)
                 # Show user mapping for reference
                 with st.expander("👥 User Mapping (for reference)"):
                     for original, anonymous in user_mapping.items():
                         if original != 'group_notification':
                             st.write(f"{original} → {anonymous}")
             else:
-                status_text.text("📊 Loading data...")
-                progress_bar.progress(20)
+                status_text.text("📊 Preparing data...")
+                progress_bar.progress(10)
                 df_analysis = df
         
         # Basic Statistics
         if basic_stats:
+            status_text.text("📊 Calculating basic statistics...")
+            progress_bar.progress(25)
+            
             st.header("📊 Chat Statistics Overview")
             
             num_messages, words, num_media_messages, num_links = get_cached_stats(selected_user, df_analysis)
@@ -755,6 +222,9 @@ if uploaded_file is not None:
 
         # Timeline Analysis
         if timeline:
+            status_text.text("📈 Generating timeline analysis...")
+            progress_bar.progress(35)
+            
             st.header("📈 Timeline Analysis")
             
             col1, col2 = st.columns(2)
@@ -812,6 +282,9 @@ if uploaded_file is not None:
 
         # Emoji Analysis
         if emoji_analysis:
+            status_text.text("😊 Analyzing emoji usage...")
+            progress_bar.progress(45)
+            
             st.header("😊 Emoji Analysis")
             try:
                 emoji_df = emoji_helper(selected_user, df_analysis)
@@ -832,13 +305,16 @@ if uploaded_file is not None:
                         st.plotly_chart(fig, use_container_width=True)
                 else:
                     st.info("No emojis found in the selected data.")
-            except:
-                st.warning("Could not analyze emojis.")
+            except Exception as e:
+                st.warning(f"Could not analyze emojis: {str(e)}")
             
             st.markdown("---")
 
         # Word Analysis
         if word_analysis:
+            status_text.text("📝 Analyzing word patterns...")
+            progress_bar.progress(55)
+            
             st.header("📝 Word Analysis")
             
             col1, col2 = st.columns(2)
@@ -870,8 +346,8 @@ if uploaded_file is not None:
                             )
                         )
                         st.plotly_chart(fig, use_container_width=True)
-                except:
-                    st.warning("Could not analyze common words.")
+                except Exception as e:
+                    st.warning(f"Could not analyze common words: {str(e)}")
             
             with col2:
                 st.subheader("☁️ Word Cloud")
@@ -883,13 +359,16 @@ if uploaded_file is not None:
                     ax.set_facecolor('none')
                     fig.patch.set_alpha(0)
                     st.pyplot(fig)
-                except:
-                    st.warning("Could not generate word cloud.")
+                except Exception as e:
+                    st.warning(f"Could not generate word cloud: {str(e)}")
             
             st.markdown("---")
 
         # Activity Analysis
         if activity_analysis:
+            status_text.text("🔥 Analyzing activity patterns...")
+            progress_bar.progress(65)
+            
             st.header("🔥 Activity Analysis")
             
             # Most Busy Users (for group chats)
@@ -930,6 +409,9 @@ if uploaded_file is not None:
 
         # User Analysis
         if user_analysis:
+            status_text.text("👥 Analyzing user interactions...")
+            progress_bar.progress(75)
+            
             st.header("👥 User Analysis")
             
             if selected_user == 'Overall' and len(df_analysis['user'].unique()) > 2:
@@ -956,6 +438,9 @@ if uploaded_file is not None:
 
         # Sentiment Analysis
         if sentiment_checkbox:
+            status_text.text("😊 Analyzing sentiment and emotions...")
+            progress_bar.progress(80)
+            
             st.header("😊 Sentiment & Emotion Analysis")
             
             try:
@@ -1058,6 +543,9 @@ if uploaded_file is not None:
 
         # Response Time Analysis
         if response_analysis:
+            status_text.text("⚡ Analyzing response patterns...")
+            progress_bar.progress(82)
+            
             st.header("⚡ Response Time & Conversation Dynamics")
             
             try:
@@ -1156,6 +644,9 @@ if uploaded_file is not None:
 
         # Communication Style Analysis
         if style_analysis:
+            status_text.text("💬 Analyzing communication styles...")
+            progress_bar.progress(84)
+            
             st.header("💬 Communication Style & Personality")
             
             try:
@@ -1229,6 +720,9 @@ if uploaded_file is not None:
 
         # Topic Analysis
         if topics_analysis:
+            status_text.text("🎯 Analyzing topics and content...")
+            progress_bar.progress(86)
+            
             st.header("🎯 Smart Content & Topic Analysis")
             
             try:
@@ -1281,6 +775,9 @@ if uploaded_file is not None:
 
         # Group Dynamics (only for group chats)
         if dynamics_analysis and len(df_analysis['user'].unique()) > 3:
+            status_text.text("🏆 Analyzing group dynamics...")
+            progress_bar.progress(88)
+            
             st.header("🏆 Group Dynamics & Social Network")
             
             try:
@@ -1345,13 +842,16 @@ if uploaded_file is not None:
 
         # AI Insights
         if insights_analysis:
+            status_text.text("🧠 Generating AI insights...")
+            progress_bar.progress(90)
+            
             st.header("🧠 AI-Generated Insights")
             
             try:
                 insights_data = generate_chat_insights(selected_user, df_analysis)
                 
                 for insight in insights_data:
-                    st.markdown(f'<div class="insight-box">{insight}</div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="insight-box">{html.escape(str(insight))}</div>', unsafe_allow_html=True)
                 
                 # Conversation highlights
                 st.subheader("💎 Conversation Highlights")
@@ -1424,7 +924,7 @@ if uploaded_file is not None:
                     for user, user_badges in users_with_badges.items():
                         with st.expander(f"🎯 {user}'s Achievements ({len(user_badges)} badges)"):
                             for badge in user_badges:
-                                st.markdown(f'<span class="badge">{badge}</span>', unsafe_allow_html=True)
+                                st.markdown(f'<span class="badge">{html.escape(str(badge))}</span>', unsafe_allow_html=True)
                 else:
                     st.info("No badges earned yet. Keep chatting to unlock achievements!")
                 
@@ -1471,6 +971,9 @@ if uploaded_file is not None:
 
         # Comprehensive Report
         if report_analysis:
+            status_text.text("📋 Generating comprehensive report...")
+            progress_bar.progress(95)
+            
             st.header("📋 Comprehensive Analysis Report")
             
             try:
@@ -1545,7 +1048,7 @@ if uploaded_file is not None:
                 if 'insights' in report_data:
                     st.subheader("🔍 Key Insights")
                     for insight in report_data['insights']:
-                        st.markdown(f'<div class="insight-box">• {insight}</div>', unsafe_allow_html=True)
+                        st.markdown(f'<div class="insight-box">• {html.escape(str(insight))}</div>', unsafe_allow_html=True)
                 
                 # Download report as JSON
                 st.subheader("💾 Export Report")
@@ -1588,6 +1091,14 @@ if uploaded_file is not None:
                 
             except Exception as e:
                 st.error(f"Error generating report: {str(e)}")
+        
+        # Final completion message
+        status_text.text("✅ Analysis complete! All insights generated successfully.")
+        progress_bar.progress(100)
+        
+        # Clear the progress bar and status text
+        progress_bar.empty()
+        status_text.empty()
 
 else:
     # Simple, clean welcome message without repeated content

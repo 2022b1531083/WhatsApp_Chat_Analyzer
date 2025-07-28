@@ -44,7 +44,7 @@ def create_wordcloud(selected_user,df):
         f = open('stop_hinglish.txt', 'r')
         stop_words = f.read()
         f.close()
-    except:
+    except FileNotFoundError:
         stop_words = ""
 
     if selected_user != 'Overall':
@@ -70,7 +70,7 @@ def most_common_words(selected_user,df):
         f = open('stop_hinglish.txt','r')
         stop_words = f.read()
         f.close()
-    except:
+    except FileNotFoundError:
         stop_words = ""
 
     if selected_user != 'Overall':
@@ -163,7 +163,7 @@ def sentiment_analysis(selected_user, df):
                 sentiments.append('Negative')
             else:
                 sentiments.append('Neutral')
-        except:
+        except Exception:
             sentiments.append('Neutral')
             polarities.append(0)
             subjectivities.append(0)
@@ -334,7 +334,7 @@ def topic_modeling(selected_user, df, n_topics=5):
             f = open('stop_hinglish.txt', 'r')
             stop_words = f.read().split()
             f.close()
-        except:
+        except FileNotFoundError:
             stop_words = []
         
         vectorizer = TfidfVectorizer(max_features=100, stop_words=stop_words, ngram_range=(1, 2))
@@ -355,7 +355,7 @@ def topic_modeling(selected_user, df, n_topics=5):
             })
         
         return topics, lda
-    except:
+    except Exception:
         return None, None
 
 def detect_important_moments(selected_user, df):
