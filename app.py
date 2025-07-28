@@ -12,6 +12,21 @@ from datetime import datetime
 import warnings
 warnings.filterwarnings('ignore')
 
+# Enable caching for better performance
+@st.cache_data
+def load_data(uploaded_file):
+    """Cache the data loading process"""
+    if uploaded_file is not None:
+        bytes_data = uploaded_file.getvalue()
+        data = bytes_data.decode("utf-8")
+        return preprocessor.preprocess(data)
+    return None
+
+@st.cache_data
+def get_cached_stats(selected_user, df):
+    """Cache basic statistics"""
+    return fetch_stats(selected_user, df)
+
 # Set page configuration
 st.set_page_config(
     page_title="Chat Analyzer - Discover Your Conversations! 🎉",
@@ -627,9 +642,7 @@ def get_chart_colors():
 uploaded_file = st.sidebar.file_uploader("📁 Upload Your Chat File", type=['txt'], help="Upload WhatsApp, Telegram, or any chat export file")
 
 if uploaded_file is not None:
-    bytes_data = uploaded_file.getvalue()
-    data = bytes_data.decode("utf-8")
-    df = preprocessor.preprocess(data)
+    df = load_data(uploaded_file)
 
     # User selection
     user_list = df['user'].unique().tolist()
@@ -685,23 +698,35 @@ if uploaded_file is not None:
 
     if st.sidebar.button("🚀 Run Analysis", type="primary"):
         
-        # Apply privacy mode if enabled
-        if privacy_mode:
-            st.info("🔒 Privacy Mode Enabled: All analysis will be performed anonymously without showing actual message content.")
-            df_analysis, user_mapping = create_anonymous_analysis(df)
-            # Show user mapping for reference
-            with st.expander("👥 User Mapping (for reference)"):
-                for original, anonymous in user_mapping.items():
-                    if original != 'group_notification':
-                        st.write(f"{original} → {anonymous}")
-        else:
-            df_analysis = df
+        # Show loading message
+        with st.spinner("🔄 Processing your chat data... This may take a few moments for large files."):
+            
+            # Progress bar
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+            
+            # Apply privacy mode if enabled
+            if privacy_mode:
+                status_text.text("🔒 Enabling privacy mode...")
+                progress_bar.progress(10)
+                st.info("🔒 Privacy Mode Enabled: All analysis will be performed anonymously without showing actual message content.")
+                df_analysis, user_mapping = create_anonymous_analysis(df)
+                progress_bar.progress(30)
+                # Show user mapping for reference
+                with st.expander("👥 User Mapping (for reference)"):
+                    for original, anonymous in user_mapping.items():
+                        if original != 'group_notification':
+                            st.write(f"{original} → {anonymous}")
+            else:
+                status_text.text("📊 Loading data...")
+                progress_bar.progress(20)
+                df_analysis = df
         
         # Basic Statistics
         if basic_stats:
             st.header("📊 Chat Statistics Overview")
             
-            num_messages, words, num_media_messages, num_links = fetch_stats(selected_user, df_analysis)
+            num_messages, words, num_media_messages, num_links = get_cached_stats(selected_user, df_analysis)
             
             col1, col2, col3, col4 = st.columns(4)
             with col1:
