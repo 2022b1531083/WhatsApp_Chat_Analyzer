@@ -618,26 +618,15 @@ else:
 
 # Function to get chart colors based on theme
 def get_chart_colors():
-    if st.session_state.dark_mode:
-        return {
-            'bg_color': 'rgba(30, 41, 59, 0.95)',
-            'paper_bg_color': 'rgba(30, 41, 59, 0.95)',
-            'font_color': '#f8fafc',
-            'grid_color': 'rgba(148, 163, 184, 0.3)',
-            'line_colors': ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
-            'title_color': '#f1f5f9',
-            'axis_color': '#cbd5e1'
-        }
-    else:
-        return {
-            'bg_color': 'rgba(255, 255, 255, 1)',
-            'paper_bg_color': 'rgba(255, 255, 255, 1)',
-            'font_color': '#1e293b',
-            'grid_color': 'rgba(148, 163, 184, 0.3)',
-            'line_colors': ['#1e40af', '#059669', '#d97706', '#dc2626', '#7c3aed'],
-            'title_color': '#0f172a',
-            'axis_color': '#475569'
-        }
+    return {
+        'bg_color': 'rgba(30, 41, 59, 0.95)' if st.session_state.dark_mode else 'rgba(255, 255, 255, 1)',
+        'paper_bg_color': 'rgba(30, 41, 59, 0.95)' if st.session_state.dark_mode else 'rgba(255, 255, 255, 1)',
+        'font_color': '#000000',      # Main font color (black)
+        'grid_color': 'rgba(148, 163, 184, 0.3)',
+        'line_colors': ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'] if st.session_state.dark_mode else ['#1e40af', '#059669', '#d97706', '#dc2626', '#7c3aed'],
+        'title_color': '#000000',     # Chart title color (black)
+        'axis_color': '#000000'       # Axis labels color (black)
+    }
 
 uploaded_file = st.sidebar.file_uploader("📁 Upload Your Chat File", type=['txt'], help="Upload WhatsApp, Telegram, or any chat export file")
 
