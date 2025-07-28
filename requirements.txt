@@ -1,0 +1,25 @@
+# Core libraries
+pandas
+numpy
+emoji
+textblob
+urlextract
+wordcloud
+
+# NLP & ML
+scikit-learn
+
+# Visualization
+matplotlib
+seaborn
+plotly
+
+# Network Graphs
+networkx
+
+# Streamlit
+streamlit
+
+# Additional dependencies
+python-dotenv
+python>=3.8
