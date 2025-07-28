@@ -1,7 +1,7 @@
 import streamlit as st
 import preprocessor
 from enhanced_helper_1 import (
-    fetch_stats, monthly_timeline, emoji_helper, most_common_words, 
+    fetch_stats, monthly_timeline, daily_timeline, emoji_helper, most_common_words, 
     create_wordcloud, most_busy_users, sentiment_analysis, sentiment_timeline,
     response_time_analysis, conversation_initiator_analysis, message_length_analysis,
     communication_style_analysis, topic_modeling, detect_important_moments
