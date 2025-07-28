@@ -1,3 +1,2 @@
-# System dependencies for the WhatsApp Chat Analyzer
 build-essential
 python3-dev 
