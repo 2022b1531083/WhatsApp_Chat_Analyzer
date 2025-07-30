@@ -56,7 +56,7 @@ streamlit run app.py
 ### Online Deployment
 
 1. **Fork this repository** on GitHub
-2. **Sign up** for [Streamlit Cloud](https://streamlit.io/cloud)
+2. **Sign up** for [Streamlit Cloud]([https://streamlit.io/cloud](https://chat-analyzer-pro.streamlit.app/))
 3. **Connect your GitHub account**
 4. **Deploy** by selecting this repository
 
