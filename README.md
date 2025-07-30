@@ -31,7 +31,7 @@ A comprehensive web application for analyzing WhatsApp chat data with advanced a
 
 ## 🚀 Live Demo
 
-[Deploy your own instance on Streamlit Cloud](https://streamlit.io/cloud)
+[Whatsapp-Chat-analyzer](https://streamlit.io/cloud)
 
 ## 📦 Installation
 
