@@ -1,24 +1,8 @@
-# Core libraries
-pandas
-numpy
-emoji
-textblob
-urlextract
-wordcloud
 
-# NLP & ML
-scikit-learn
-
-# Visualization
+streamlit
 matplotlib
 seaborn
-plotly
-
-# Network Graphs
-networkx
-
-# Streamlit
-streamlit
-
-# Additional dependencies
-python-dotenv
+urlextract
+wordcloud
+pandas
+emoji
