@@ -43,8 +43,8 @@ __________
 ## 🌟 Problem face:
 
 - **Error related to time formate** 
-- **solved by replacing the reguler expressions **
-- **problem by am pm **  
+- **solved by replacing the reguler expressions**
+- **problem by am pm formate**  
 - **also change reg expression accorfing to your formate**
 
 ### Local Development
