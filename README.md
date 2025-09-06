@@ -38,7 +38,14 @@ __________
 
 ---
 
-## 📦 Installation
+## 📦 Installation:
+
+## 🌟 Problem face:
+
+- **Error related to time formate** 
+- **solved by replacing the reguler expressions **
+- **problem by am pm **  
+- **also change reg expression accorfing to your formate**
 
 ### Local Development
 ```bash
@@ -159,14 +166,6 @@ Create an issue on GitHub
 Check the documentation
 
 Review the code comments
-
-
-## 🌟 Problem face:
-
-- **Error related to time formate** 
-- **solved by replacing the reguler expressions **
-- **problem by am pm **  
-- **also change reg expression accorfing to your formate**
 
 
 Made with ❤️ for better communication insights
