@@ -34,11 +34,8 @@ A comprehensive web application for analyzing WhatsApp chat data with advanced a
 ---
 
 ## 🚀 Live Demo
-__________
-
+https://whatsappchatanalyzer-by-yogeshkumar9891ml.streamlit.app/
 ---
-
-## 📦 Installation:
 
 ## 🌟 Problem face:
 
@@ -46,6 +43,8 @@ __________
 - **solved by replacing the reguler expressions**
 - **problem by am pm formate**  
 - **also change reg expression accorfing to your formate**
+
+## 📦 Installation:
 
 ### Local Development
 ```bash
