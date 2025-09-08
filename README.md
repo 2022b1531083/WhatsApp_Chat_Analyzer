@@ -34,6 +34,8 @@ A comprehensive web application for analyzing WhatsApp chat data with advanced a
 ---
 
 ## 🚀 Live Demo
+
+-- **dont click direct just copy my url and paste in your browser**
 https://whatsappchatanalyzer-by-yogeshkumar9891ml.streamlit.app/
 
 ## 🌟 Problem face:
